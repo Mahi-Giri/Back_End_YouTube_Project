@@ -181,7 +181,9 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken =
-        req.cookie.refreshToken || req.body.refreshToken;
+        req.cookies.refreshToken || req.body.refreshToken;
+
+    // console.log(incomingRefreshToken);
 
     if (!incomingRefreshToken) throw new apiError(401, "unauthorized request");
 
@@ -351,7 +353,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                     $size: "$subscribedTo",
                 },
                 isSubscribed: {
-                    $condition: {
+                    $cond: {
                         if: {
                             $in: [req.user?._id, "$subscribers.subscriber"],
                         },
@@ -376,8 +378,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     ]);
 
     if (!channel?.length) throw new apiError(400, "Channel not exists");
-
-    console.log(channel);
 
     return res
         .status(200)
